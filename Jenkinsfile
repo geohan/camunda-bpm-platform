@@ -18,13 +18,14 @@ pipeline {
     copyArtifactPermission('*')
   }
   parameters {
+    booleanParam name: 'STANDALONE', defaultValue: false, description: 'Set to true to avoid building the platform.'
     string defaultValue: 'cambpm-ee-main-pr/master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_DOWNSTREAM'
   }
   stages {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
+          env.BRANCH_NAME == cambpmDefaultBranch() || (!pullRequest.labels.contains('no-build') && !params.STANDALONE)
         }
       }
       steps {
